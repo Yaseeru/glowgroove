@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -8,10 +9,12 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    credentials: true,
+  })
+);
 
 // Database connection
 const connectDB = async () => {
@@ -24,34 +27,43 @@ const connectDB = async () => {
   }
 };
 
-// Connect to database
 connectDB();
 
 // Routes
-app.get('/', (req, res) => {
-  res.json({
-    message: '🌟 Welcome to GlowGroove API!',
-    tagline: 'Glow up your space. Groove up your mood.',
-    status: 'Server is running smoothly ✨'
-  });
-});
-
-// Import routes (we'll create these next)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payments'));
+
+// Serve static files from React in production
+if (process.env.NODE_ENV === 'production') {
+  const clientPath = path.join(__dirname, 'client', 'build');
+  app.use(express.static(clientPath));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientPath, 'index.html'));
+  });
+} else {
+  // Dev environment root route
+  app.get('/', (req, res) => {
+    res.json({
+      message: '🌟 Welcome to GlowGroove API!',
+      tagline: 'Glow up your space. Groove up your mood.',
+      status: 'Server is running smoothly ✨',
+    });
+  });
+}
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
   res.status(500).json({
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
   });
 });
 
-// Catch-all 404 handler using RegExp
+// Catch-all 404 (after frontend fallback and API routes)
 app.use(/.*/, (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
