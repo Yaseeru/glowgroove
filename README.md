@@ -60,7 +60,7 @@ glowgroove-store/
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Yaseeru/glowgroove.git
    cd glowgroove-store
    ```
 
@@ -114,9 +114,9 @@ glowgroove-store/
 - [x] Order management
 - [x] Responsive design
 - [x] Admin dashboard for product management
-- [ ] Payment integration (Stripe/PayPal)
-- [ ] Email notifications
-- [ ] Product reviews and ratings
+- [x] Payment integration (Stripe/PayPal)
+- [x] Email notifications
+- [x] Product reviews and ratings
 
 ## 🎯 Pages
 
@@ -148,11 +148,11 @@ glowgroove-store/
 
 ## 📸 Screenshots
 
-*Coming soon...*
+![Screenshot](./screenshot.png)
 
 ## 🚀 Deployment
 
-### Frontend (Netlify/Vercel)
+### Frontend (Netlify)
 1. Build the React app: `npm run build`
 2. Deploy the `build` folder to your hosting platform
 
@@ -162,13 +162,11 @@ glowgroove-store/
 3. Ensure MongoDB Atlas is configured for production
 
 ## 🤝 Contributing
-
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
-
 
 
 ## 👨‍💻 Abdulhamid A.S
