@@ -52,7 +52,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Error handler
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
   res.status(500).json({
@@ -61,6 +61,7 @@ app.use((err, req, res, next) => {
   });
 });
 
+// Catch-all route for unhandled endpoints (safe Express 5-compatible)
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
