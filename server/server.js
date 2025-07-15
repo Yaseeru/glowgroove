@@ -9,14 +9,12 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true
+}));
 
-// Database connection
+// DB Connection
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
@@ -29,47 +27,45 @@ const connectDB = async () => {
 
 connectDB();
 
-// Routes
+// API Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payments'));
 
-// Serve static files from React in production
+// Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const clientPath = path.join(__dirname, 'client', 'build');
-  app.use(express.static(clientPath));
+  const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
+  app.use(express.static(clientBuildPath));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.join(clientPath, 'index.html'));
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
 } else {
-  // Dev environment root route
+  // Dev health check route
   app.get('/', (req, res) => {
     res.json({
       message: '🌟 Welcome to GlowGroove API!',
       tagline: 'Glow up your space. Groove up your mood.',
-      status: 'Server is running smoothly ✨',
+      status: 'Server is running smoothly ✨'
     });
   });
 }
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
   console.error('❌ Error:', err.stack);
   res.status(500).json({
     message: 'Something went wrong!',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error',
+    error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
   });
 });
 
-// Catch-all 404 (after frontend fallback and API routes)
 app.use(/.*/, (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
   console.log(`🚀 GlowGroove server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
