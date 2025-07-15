@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -14,7 +13,7 @@ app.use(cors({
   credentials: true
 }));
 
-// DB Connection - Updated without deprecated options
+// DB Connection
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
@@ -33,26 +32,15 @@ app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/payments', require('./routes/payments'));
 
-// Serve frontend in production
-if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
-  app.use(express.static(clientBuildPath));
-
-  // Updated route handler without wildcard
-  app.get(/^\/(?!api).*/, (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
+// Health check endpoint
+app.get('/', (req, res) => {
+  res.json({
+    message: '🌟 Welcome to GlowGroove API!',
+    status: 'Server is running smoothly ✨',
+    environment: process.env.NODE_ENV || 'development',
+    docs: process.env.CLIENT_URL ? `${process.env.CLIENT_URL}/api-docs` : 'http://localhost:3000/api-docs'
   });
-} else {
-  // Dev health check route
-  app.get('/', (req, res) => {
-    res.json({
-      message: '🌟 Welcome to GlowGroove API!',
-      tagline: 'Glow up your space. Groove up your mood.',
-      status: 'Server is running smoothly ✨',
-      environment: process.env.NODE_ENV || 'development'
-    });
-  });
-}
+});
 
 // Global error handler
 app.use((err, req, res, next) => {
@@ -76,6 +64,7 @@ const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`🚀 GlowGroove server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🔗 Allowed Origins: ${process.env.CLIENT_URL || 'http://localhost:3000'}`);
 });
 
 // Handle unhandled promise rejections
