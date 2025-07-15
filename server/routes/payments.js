@@ -1,5 +1,6 @@
 const express = require("express");
 const axios = require("axios");
+const crypto = require("crypto"); // 🛠️ ADD THIS LINE - missing import
 const { protect } = require("../middleware/auth");
 const Order = require("../models/Order");
 
