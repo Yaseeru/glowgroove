@@ -14,7 +14,7 @@ app.use(cors({
   credentials: true
 }));
 
-// DB Connection
+// DB Connection - Updated without deprecated options
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGODB_URI);
@@ -38,7 +38,8 @@ if (process.env.NODE_ENV === 'production') {
   const clientBuildPath = path.join(__dirname, '..', 'client', 'build');
   app.use(express.static(clientBuildPath));
 
-  app.get('*', (req, res) => {
+  // Updated route handler without wildcard
+  app.get(/^\/(?!api).*/, (req, res) => {
     res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
 } else {
@@ -47,7 +48,8 @@ if (process.env.NODE_ENV === 'production') {
     res.json({
       message: '🌟 Welcome to GlowGroove API!',
       tagline: 'Glow up your space. Groove up your mood.',
-      status: 'Server is running smoothly ✨'
+      status: 'Server is running smoothly ✨',
+      environment: process.env.NODE_ENV || 'development'
     });
   });
 }
@@ -61,13 +63,29 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Catch-all route for unhandled endpoints (safe Express 5-compatible)
-app.use('*', (req, res) => {
-  res.status(404).json({ message: 'Route not found' });
+// Catch-all route for unhandled endpoints
+app.use((req, res) => {
+  res.status(404).json({ 
+    message: 'Route not found',
+    path: req.path,
+    method: req.method
+  });
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 GlowGroove server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Unhandled Rejection:', err);
+  server.close(() => process.exit(1));
+});
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err);
+  server.close(() => process.exit(1));
 });
