@@ -17,7 +17,7 @@ router.post('/paystack/initiate', protect, async (req, res) => {
                {
                     email,
                     amount: Math.round(amount * 100),
-                    callback_url: 'http://localhost:3000/'
+                    callback_url: 'https://glow-groove.netlify.app'
                },
                {
                     headers: {
